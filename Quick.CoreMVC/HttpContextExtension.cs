@@ -12,11 +12,11 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Runtime.CompilerServices;
-using System.Globalization;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 using Quick.CoreMVC.Utils;
+using Quick.Localize;
 
 namespace Quick.CoreMVC
 {
@@ -24,67 +24,62 @@ namespace Quick.CoreMVC
     {
         private static readonly String FORMDATA_KEY = $"{typeof(HttpContextExtension).FullName}.{nameof(FORMDATA_KEY)}";
         public static readonly String ACCEPT_LANGUAGE_KEY = "Accept-Language";
+        
+        /// <summary>
+        /// 获取语言
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static String GetLanguage(this HttpContext context)
+        {
+            var req = context.Request;
+            String language = String.Empty;
+            //先尝试从Cookie中读取语言地区
+            language = context.Request.Cookies[ACCEPT_LANGUAGE_KEY];
+            if (!String.IsNullOrEmpty(language))
+                return language;
+            //然后尝试从Header中读取语言地区
+            var acceptLanguage = req.Headers[ACCEPT_LANGUAGE_KEY].FirstOrDefault();
+            if (!String.IsNullOrEmpty(acceptLanguage))
+                language = acceptLanguage.Split(new Char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            if (String.IsNullOrEmpty(language))
+                language = TextManager.DefaultLanguage;
+            return language;
+        }
 
-        ///// <summary>
-        ///// 得到Session信息
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <returns></returns>
-        //public static IDictionary<String, Object> GetSession(this HttpContextExtension context)
-        //{
-        //    return SessionMiddleware.GetSession(context);
-        //}
+        /// <summary>
+        /// 得到文本管理器
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static TextManager GetTextManager(this HttpContext context)
+        {
+            return TextManager.GetInstance(context.GetLanguage());
+        }
 
-        ///// <summary>
-        ///// 获取语言
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <returns></returns>
-        //public static String GetLanguage(this HttpContext context)
-        //{
-        //    var req = context.Request;
-        //    String language = String.Empty;
-        //    //先尝试从Cookie中读取语言地区
-        //    language = context.Request.Cookies[ACCEPT_LANGUAGE_KEY];
-        //    if (!String.IsNullOrEmpty(language))
-        //        return language;
-        //    //然后尝试从Header中读取语言地区
-        //    var acceptLanguage = req.Headers.Get(ACCEPT_LANGUAGE_KEY);
-        //    if (!String.IsNullOrEmpty(acceptLanguage))
-        //        language = acceptLanguage.Split(new Char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-        //    if (String.IsNullOrEmpty(language))
-        //        language = TextManager.DefaultLanguage;
-        //    return language;
-        //}
+        /// <summary>
+        /// 设置语言
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="language"></param>
+        public static void SetLanguage(this HttpContext context, String language)
+        {
+            var rep = context.Response;
+            rep.Cookies.Append(ACCEPT_LANGUAGE_KEY, language);
+        }
 
-        //public static TextManager GetTextManager(this HttpContext context)
-        //{
-        //    return TextManager.GetInstance(context.GetLanguage());
-        //}
-
-        ///// <summary>
-        ///// 设置语言
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <param name="language"></param>
-        //public static void SetLanguage(this HttpContext context, String language)
-        //{
-        //    var rep = context.Response;
-        //    rep.Cookies.Append(ACCEPT_LANGUAGE_KEY, language);
-        //}
-
-        ///// <summary>
-        ///// 得到当前语言文字
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <param name="key"></param>
-        ///// <returns></returns>
-        //public static String GetText(this HttpContext context, Enum key)
-        //{
-        //    String language = context.GetLanguage();
-        //    var textManager = TextManager.GetInstance(language);
-        //    return textManager.GetText(key);
-        //}
+        /// <summary>
+        /// 得到当前语言文字
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static String GetText(this HttpContext context, Enum key)
+        {
+            String language = context.GetLanguage();
+            var textManager = TextManager.GetInstance(language);
+            return textManager.GetText(key);
+        }
 
         /// <summary>
         /// 获取POST提交的表单数据
