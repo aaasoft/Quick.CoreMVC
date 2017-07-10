@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.2" />
-    <PackageReference Include="Quick.Localize" Version="1.0.0" />
+    <PackageReference Include="Quick.Localize" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
