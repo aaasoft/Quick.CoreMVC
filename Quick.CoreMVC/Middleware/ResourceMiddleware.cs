@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quick.CoreMVC.Resource
+namespace Quick.CoreMVC.Middleware
 {
     public class ResourceMiddleware
     {

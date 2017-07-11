@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Quick.CoreMVC.Hunter;
 using Microsoft.AspNetCore.Http;
+using Quick.CoreMVC.Middleware;
 
 namespace Quick.CoreMVC.Node
 {
@@ -50,7 +51,7 @@ namespace Quick.CoreMVC.Node
             foreach (var method in node.GetMethods())
             {
                 method.Value.HttpMethod = method.Key;
-                method.Value.Path = NodeApiMiddleware.Prefix + String.Join("/", nodeStack
+                method.Value.Path = ApiMiddleware.Prefix + String.Join("/", nodeStack
                         .Reverse()
                         .Select(t => t.Id)
                         .ToArray());

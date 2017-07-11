@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -26,9 +27,13 @@ namespace Quick.CoreMVC
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseMiddleware<Node.NodeApiMiddleware>();
+            //支持静态文件
+            app.UseStaticFiles();
+            //支持API中间件
+            app.UseMiddleware<Middleware.ApiMiddleware>();
             app.Run(async (context) =>
             {
+                context.Response.StatusCode = 404;
                 await context.Response.WriteAsync("404 NOT FOUND");
             });
         }

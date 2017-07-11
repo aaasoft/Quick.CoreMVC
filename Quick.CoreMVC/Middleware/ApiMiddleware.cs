@@ -1,24 +1,25 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Quick.CoreMVC.Hunter;
+using Quick.CoreMVC.Node;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quick.CoreMVC.Node
+namespace Quick.CoreMVC.Middleware
 {
-    public class NodeApiMiddleware : IHungryPropertyHunter
+    public class ApiMiddleware : IHungryPropertyHunter
     {
         private RequestDelegate _next;
 
         public const string JSONP_CALLBACK = "callback";
-        public static NodeApiMiddleware Instance { get; private set; }
+        public static ApiMiddleware Instance { get; private set; }
         public static string Prefix = "/api/";
         private Encoding encoding = new UTF8Encoding(false);
 
-        public NodeApiMiddleware(RequestDelegate next = null)
+        public ApiMiddleware(RequestDelegate next = null)
         {
             _next = next;
         }
