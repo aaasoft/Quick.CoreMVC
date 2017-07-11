@@ -5,6 +5,7 @@ using Quick.CoreMVC.Node;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,8 @@ namespace Quick.CoreMVC.Middleware
         public ApiMiddleware(RequestDelegate next = null)
         {
             _next = next;
+            //扫描加载的程序集
+
         }
 
         /// <summary>
@@ -45,50 +48,50 @@ namespace Quick.CoreMVC.Middleware
             if (string.IsNullOrEmpty(nodePath))
                 return _next.Invoke(context);
 
-            var currentNode = NodeManager.Instance.GetNode(nodePath);
-            var nodeMethod = currentNode?.GetMethod(req.Method);
-            if (nodeMethod == null)
-                return _next.Invoke(context);
+            //var currentNode = NodeManager.Instance.GetNode(nodePath);
+            //var nodeMethod = currentNode?.GetMethod(req.Method);
+            //if (nodeMethod == null)
+            //    return _next.Invoke(context);
 
             Object data = null;
-            try
-            {
-                //调用方法处理
-                if (NodeManager.Instance.MethodInvokeHandler != null)
-                    nodeMethod = NodeManager.Instance.MethodInvokeHandler.Invoke(nodeMethod, context);
-                //调用
-                var invokeTime = DateTime.Now;
-                data = nodeMethod?.Invoke(context);
-                //返回值处理
-                if (NodeManager.Instance.ReturnValueHandler != null)
-                    data = NodeManager.Instance.ReturnValueHandler.Invoke(nodeMethod, data, invokeTime);
-                //如果返回值不是ApiResult
-                if (!(data is ApiResult))
-                {
-                    var message = $"{nodeMethod.Name}成功";
-                    var ret = ApiResult.Success(message, data);
-                    ret.SetMetaInfo("usedTime", (DateTime.Now - invokeTime).ToString());
-                    data = ret;
-                }
-            }
-            catch (NodeMethodException ex)
-            {
-                data = ApiResult.Error(ex.HResult, ex.Message, ex.MethodData);
-            }
-            catch (NodeMethodHandledException)
-            {
-                return Task.Delay(0);
-            }
-            catch (Exception ex)
-            {
-                if (NodeManager.Instance.ExceptionHandler == null)
-                    throw ex;
-                data = NodeManager.Instance.ExceptionHandler.Invoke(ex);
-            }
+            //try
+            //{
+            //    //调用方法处理
+            //    if (NodeManager.Instance.MethodInvokeHandler != null)
+            //        nodeMethod = NodeManager.Instance.MethodInvokeHandler.Invoke(nodeMethod, context);
+            //    //调用
+            //    var invokeTime = DateTime.Now;
+            //    data = nodeMethod?.Invoke(context);
+            //    //返回值处理
+            //    if (NodeManager.Instance.ReturnValueHandler != null)
+            //        data = NodeManager.Instance.ReturnValueHandler.Invoke(nodeMethod, data, invokeTime);
+            //    //如果返回值不是ApiResult
+            //    if (!(data is ApiResult))
+            //    {
+            //        var message = $"{nodeMethod.Name}成功";
+            //        var ret = ApiResult.Success(message, data);
+            //        ret.SetMetaInfo("usedTime", (DateTime.Now - invokeTime).ToString());
+            //        data = ret;
+            //    }
+            //}
+            //catch (NodeMethodException ex)
+            //{
+            //    data = ApiResult.Error(ex.HResult, ex.Message, ex.MethodData);
+            //}
+            //catch (NodeMethodHandledException)
+            //{
+            //    return Task.Delay(0);
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (NodeManager.Instance.ExceptionHandler == null)
+            //        throw ex;
+            //    data = NodeManager.Instance.ExceptionHandler.Invoke(ex);
+            //}
             //要输出的内容
             string result = null;
             //JSON序列化的结果
-            var json = JsonConvert.SerializeObject(data, NodeManager.Instance.JsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(data/*, NodeManager.Instance.JsonSerializerSettings*/);
             var jsonpCallback = req.Query[JSONP_CALLBACK];
 
             if (string.IsNullOrEmpty(jsonpCallback))
@@ -107,7 +110,7 @@ namespace Quick.CoreMVC.Middleware
 
         public void Hunt(IDictionary<string, string> properties)
         {
-            NodeManager.Instance.Init(properties);
+            //NodeManager.Instance.Init(properties);
         }
     }
 }

@@ -2,17 +2,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Resource\NodeApiMiddleware.cs" />
-  </ItemGroup>
+  <Import Project="$(SolutionDir)Setting\Library.setting" />
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
     <PackageReference Include="Quick.Localize" Version="1.0.1" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resource\" />
-  </ItemGroup>
-
 </Project>

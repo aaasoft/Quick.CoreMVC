@@ -17,22 +17,7 @@ namespace Quick.CoreMVC.Node
         public virtual Type InputType { get; } = null;
         public virtual string Description { get; } = String.Empty;
         public virtual string InvokeExample { get; } = String.Empty;
-        public virtual string ReturnValueExample
-        {
-            get
-            {
-                if (HttpMethod == AbstractNode.HTTP_METHOD_POST)
-                {
-                    return $@"成功时示例：
-{JsonConvert.SerializeObject(ApiResult.Success($"{Name}成功"), Formatting.Indented)}
-
-失败时示例：
-{JsonConvert.SerializeObject(ApiResult.Error($"{Name}失败"), Formatting.Indented)}
-";
-                }
-                return String.Empty;
-            }
-        }
+        public virtual string ReturnValueExample { get; } = String.Empty;
         public virtual string[] Tags { get; }
 
         /// <summary>
@@ -112,13 +97,14 @@ namespace Quick.CoreMVC.Node
             }
             catch (Exception ex)
             {
-                throw new NodeMethodException(410, "传入参数错误，请检查参数是否正确。");
+                //throw new NodeMethodException(410, "传入参数错误，请检查参数是否正确。");
+                throw new Exception();
             }
             //自身参数处理器
             input = HandleParameter(context, input);
             //全局参数处理器
-            if (NodeManager.Instance.ParameterHandler != null)
-                input = (TInput)NodeManager.Instance.ParameterHandler.Invoke(this, context, input);
+            //if (NodeManager.Instance.ParameterHandler != null)
+            //    input = (TInput)NodeManager.Instance.ParameterHandler.Invoke(this, context, input);
             //调用
             return Invoke(context, input);
         }
