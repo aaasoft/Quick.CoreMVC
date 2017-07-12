@@ -6,11 +6,8 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quick.CoreMVC", "Quick.CoreMVC\Quick.CoreMVC.csproj", "{0C4A8A97-3430-4C76-9515-15E416A35B4F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Launcher", "Launcher\Launcher.csproj", "{FB38FFBF-C032-4BB6-A389-BBBE835045EB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8CC7CDEE-E6F3-49F8-93C1-CF807C463C6D} = {8CC7CDEE-E6F3-49F8-93C1-CF807C463C6D}
-	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Test", "Plugin.Test\Plugin.Test.csproj", "{8CC7CDEE-E6F3-49F8-93C1-CF807C463C6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Test", "Plugin.Test\Plugin.Test.csproj", "{8CC7CDEE-E6F3-49F8-93C1-CF807C463C6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

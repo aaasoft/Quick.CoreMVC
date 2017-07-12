@@ -4,4 +4,9 @@
   <PropertyGroup>
     <OutputPath>$(BaseOutputPath)\Program\</OutputPath>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Plugin.Test\Plugin.Test.csproj">
+      <Private>true</Private>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

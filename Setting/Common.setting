@@ -8,8 +8,4 @@
   <PropertyGroup>
     <BaseOutputPath>$(SolutionDir)#build#\1_bin\$(Configuration)</BaseOutputPath>
   </PropertyGroup>
-  <!--设置输出目录-->
-  <PropertyGroup>
-    <OutputPath>$(BaseOutputPath)\_Assemblies\$(MSBuildProjectName)</OutputPath>
-  </PropertyGroup>
 </Project>

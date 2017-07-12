@@ -3,6 +3,6 @@
   <Import Project="$(SolutionDir)Setting\Common.setting" />
   <PropertyGroup>
     <!--设置类库项目的输出目录-->
-    <OutputPath>$(BaseOutputPath)\Program\Libs</OutputPath>
+    <OutputPath>$(BaseOutputPath)\Program\</OutputPath>
   </PropertyGroup>
 </Project>

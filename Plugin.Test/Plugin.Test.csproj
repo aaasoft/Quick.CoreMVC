@@ -4,14 +4,15 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)Setting\Plugin.setting" />
   <ItemGroup>
+    <None Remove="Resource\index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resource\index.html" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Quick.CoreMVC\Quick.CoreMVC.csproj">
       <Private>false</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Resource\index.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
