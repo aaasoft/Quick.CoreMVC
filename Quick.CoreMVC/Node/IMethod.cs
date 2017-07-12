@@ -10,13 +10,9 @@ namespace Quick.CoreMVC.Node
     public interface IMethod
     {
         /// <summary>
-        /// 路径
-        /// </summary>
-        String Path { get; set; }
-        /// <summary>
         /// HTTP方法
         /// </summary>
-        String HttpMethod { get; set; }
+        HttpMethod Method { get;}
         /// <summary>
         /// 方法名称
         /// </summary>

@@ -11,9 +11,9 @@ namespace Quick.CoreMVC.Node
 {
     public abstract class AbstractMethod : IMethod
     {
-        public String Path { get; set; }
-        public String HttpMethod { get; set; }
+   
         public abstract string Name { get; }
+        public abstract HttpMethod Method { get; }
         public virtual Type InputType { get; } = null;
         public virtual string Description { get; } = String.Empty;
         public virtual string InvokeExample { get; } = String.Empty;

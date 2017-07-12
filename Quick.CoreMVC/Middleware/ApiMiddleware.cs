@@ -4,6 +4,7 @@ using Quick.CoreMVC.Hunter;
 using Quick.CoreMVC.Node;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,26 +18,34 @@ namespace Quick.CoreMVC.Middleware
 
         public const string JSONP_CALLBACK = "callback";
         public static ApiMiddleware Instance { get; private set; }
-        public static string Prefix = "/api/";
+
         private Encoding encoding = new UTF8Encoding(false);
+        private Dictionary<string, IMethod> apiMethodDict = new Dictionary<string, IMethod>();
 
         public ApiMiddleware(RequestDelegate next = null)
         {
             _next = next;
             //扫描加载的程序集
-
-        }
-
-        /// <summary>
-        /// 获取节点路径
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public string GetNodePath(string path)
-        {
-            if (path.StartsWith(Prefix))
-                return path.Substring(Prefix.Length);
-            return null;
+            var dllDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var di = new DirectoryInfo(dllDir);
+            foreach (var file in di.GetFiles("Plugin.*.dll"))
+            {
+                var assemblyName = Path.GetFileNameWithoutExtension(file.Name);
+                var assembly = Assembly.Load(new AssemblyName(assemblyName));
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (typeof(IMethod).IsAssignableFrom(type))
+                    {
+                        var methodPath = type.FullName;
+                        if (methodPath.StartsWith(assemblyName))
+                            methodPath = methodPath.Substring(assemblyName.Length + 1);
+                        methodPath = methodPath.Replace('.', '/');
+                        methodPath = $"/{assemblyName}/{methodPath}";
+                        var method = Activator.CreateInstance(type) as IMethod;
+                        apiMethodDict[methodPath] = method;
+                    }
+                }
+            }
         }
 
         public Task Invoke(HttpContext context)
@@ -44,16 +53,32 @@ namespace Quick.CoreMVC.Middleware
             var req = context.Request;
             var rep = context.Response;
 
-            var nodePath = GetNodePath(req.Path.Value);
-            if (string.IsNullOrEmpty(nodePath))
+            var path = req.Path.Value;
+            HttpMethod currentHttpMethod;
+            IMethod apiMethod;
+            if (
+                //如果路径为空
+                string.IsNullOrEmpty(path)
+                //如果API方法未找到此路径
+                || !apiMethodDict.TryGetValue(path, out apiMethod)
+                //如果HTTP方法不能转换为枚举
+                || !Enum.TryParse(req.Method, out currentHttpMethod)
+                //如果HTTP方法与Api方法注册的HTTP方法不匹配
+                || apiMethod.Method != (apiMethod.Method | currentHttpMethod))
                 return _next.Invoke(context);
 
-            //var currentNode = NodeManager.Instance.GetNode(nodePath);
-            //var nodeMethod = currentNode?.GetMethod(req.Method);
-            //if (nodeMethod == null)
-            //    return _next.Invoke(context);
 
             Object data = null;
+            //调用
+            var invokeTime = DateTime.Now;
+            data = apiMethod.Invoke(context);
+            //如果返回值不是ApiResult
+            if (!(data is ApiResult))
+            {
+                var ret = ApiResult.Success(data);
+                ret.SetMetaInfo("usedTime", (DateTime.Now - invokeTime).ToString());
+                data = ret;
+            }
             //try
             //{
             //    //调用方法处理
