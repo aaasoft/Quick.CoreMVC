@@ -18,7 +18,7 @@ using System.Net;
 using Quick.CoreMVC.Utils;
 using Quick.Localize;
 
-namespace Quick.CoreMVC
+namespace Quick.CoreMVC.Api
 {
     public static class HttpContextExtension
     {

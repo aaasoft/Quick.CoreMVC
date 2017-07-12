@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Quick.CoreMVC.Node
+namespace Quick.CoreMVC.Api
 {
     /// <summary>
     /// HTTP方法枚举

@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quick.CoreMVC.Node
+namespace Quick.CoreMVC.Api
 {
     public abstract class AbstractMethod : IMethod
     {
@@ -53,9 +53,9 @@ namespace Quick.CoreMVC.Node
 
         public override object Invoke(HttpContext context)
         {
-            NodeParameterAttribute attribute = typeof(TInput).GetTypeInfo()
-                .GetCustomAttributes(typeof(NodeParameterAttribute), false)
-                .FirstOrDefault() as NodeParameterAttribute;
+            ApiParameterAttribute attribute = typeof(TInput).GetTypeInfo()
+                .GetCustomAttributes(typeof(ApiParameterAttribute), false)
+                .FirstOrDefault() as ApiParameterAttribute;
 
             bool valueToObject = false;
             String[] ignoreProperties = null;

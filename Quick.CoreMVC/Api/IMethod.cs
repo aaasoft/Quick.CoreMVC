@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Quick.CoreMVC.Node
+namespace Quick.CoreMVC.Api
 {
     public interface IMethod
     {
