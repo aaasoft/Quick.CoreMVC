@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Quick.CoreMVC
+namespace Launcher
 {
     public class Startup
     {
@@ -35,13 +35,17 @@ namespace Quick.CoreMVC
 #endif
             //支持Session
             app.UseSession();
+
+            //支持登录控制
+            app.UseMiddleware<Launcher.Middleware.LoginMiddleware>();
+
             //支持静态文件
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory())
             });
             //支持API中间件
-            app.UseMiddleware<Middleware.ApiMiddleware>();
+            app.UseMiddleware<Quick.CoreMVC.Middleware.ApiMiddleware>();
             app.Run(async (context) =>
             {
                 context.Response.StatusCode = 404;

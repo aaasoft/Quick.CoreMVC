@@ -11,7 +11,7 @@ namespace Launcher
             System.IO.Directory.SetCurrentDirectory(currentDir);
 
             var server = new Quick.CoreMVC.Server("http://*:3000");
-            server.Run();
+            server.Run<Startup>();
         }
     }
 }
