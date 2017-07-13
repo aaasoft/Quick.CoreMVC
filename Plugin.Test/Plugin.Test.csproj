@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)Setting\Plugin.setting" />
   <ItemGroup>
     <None Remove="Resource\index.html" />
   </ItemGroup>
