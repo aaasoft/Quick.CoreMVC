@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using Quick.CoreMVC.Hunter;
 using Quick.CoreMVC.Api;
+using Quick.Plugin;
+using Quick.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,21 +27,24 @@ namespace Quick.CoreMVC.Middleware
         {
             _next = next;
             //扫描加载的程序集
-            var dllDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var di = new DirectoryInfo(dllDir);
-            foreach (var file in di.GetFiles("Plugin.*.dll"))
+            foreach (var pluginInfo in PluginManager.Instance.GetAllPlugins())
             {
-                var assemblyName = Path.GetFileNameWithoutExtension(file.Name);
-                var assembly = Assembly.Load(new AssemblyName(assemblyName));
+                var assembly = Assembly.Load(new AssemblyName(pluginInfo.Id));
                 foreach (var type in assembly.GetTypes())
                 {
                     if (typeof(IMethod).IsAssignableFrom(type))
                     {
                         var methodPath = type.FullName;
-                        if (methodPath.StartsWith(assemblyName))
-                            methodPath = methodPath.Substring(assemblyName.Length + 1);
-                        methodPath = methodPath.Replace('.', '/');
-                        methodPath = $"/{assemblyName}/{methodPath}";
+                        if (methodPath.StartsWith(pluginInfo.Id))
+                        {
+                            methodPath = methodPath.Substring(pluginInfo.Id.Length + 1);
+                            methodPath = methodPath.Replace('.', '/');
+                            methodPath = $"/{pluginInfo.Id}/{methodPath}";
+                        }
+                        else
+                        {
+                            methodPath = methodPath.Replace('.', '/');
+                        }
                         var method = Activator.CreateInstance(type) as IMethod;
                         apiMethodDict[methodPath] = method;
                     }
@@ -79,40 +83,7 @@ namespace Quick.CoreMVC.Middleware
                 ret.SetMetaInfo("usedTime", (DateTime.Now - invokeTime).ToString());
                 data = ret;
             }
-            //try
-            //{
-            //    //调用方法处理
-            //    if (NodeManager.Instance.MethodInvokeHandler != null)
-            //        nodeMethod = NodeManager.Instance.MethodInvokeHandler.Invoke(nodeMethod, context);
-            //    //调用
-            //    var invokeTime = DateTime.Now;
-            //    data = nodeMethod?.Invoke(context);
-            //    //返回值处理
-            //    if (NodeManager.Instance.ReturnValueHandler != null)
-            //        data = NodeManager.Instance.ReturnValueHandler.Invoke(nodeMethod, data, invokeTime);
-            //    //如果返回值不是ApiResult
-            //    if (!(data is ApiResult))
-            //    {
-            //        var message = $"{nodeMethod.Name}成功";
-            //        var ret = ApiResult.Success(message, data);
-            //        ret.SetMetaInfo("usedTime", (DateTime.Now - invokeTime).ToString());
-            //        data = ret;
-            //    }
-            //}
-            //catch (NodeMethodException ex)
-            //{
-            //    data = ApiResult.Error(ex.HResult, ex.Message, ex.MethodData);
-            //}
-            //catch (NodeMethodHandledException)
-            //{
-            //    return Task.Delay(0);
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (NodeManager.Instance.ExceptionHandler == null)
-            //        throw ex;
-            //    data = NodeManager.Instance.ExceptionHandler.Invoke(ex);
-            //}
+
             //要输出的内容
             string result = null;
             //JSON序列化的结果
@@ -129,7 +100,7 @@ namespace Quick.CoreMVC.Middleware
                 rep.ContentType = "application/x-javascript";
                 result = $"{jsonpCallback}({json})";
             }
-            rep.Headers["Expires"] = DateTime.Now.ToString("R");
+            rep.Headers["Cache-Control"] = "no-cache";
             return context.Output(encoding.GetBytes(result), true);
         }
 
