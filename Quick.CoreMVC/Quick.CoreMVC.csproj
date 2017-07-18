@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
     <Description>A sample web MVC framework.base on netstandard1.5。</Description>
-    <Version>1.0.0-preview4</Version>
+    <Version>1.0.0-preview5</Version>
     <PackageProjectUrl>https://github.com/aaasoft/Quick.CoreMVC</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/aaasoft/Quick.CoreMVC/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.2" />
     <PackageReference Include="Quick.Localize" Version="1.0.1" />
-    <PackageReference Include="Quick.Plugin" Version="1.0.1" />
+    <PackageReference Include="Quick.Plugin" Version="1.0.2" />
     <PackageReference Include="Quick.Properties" Version="1.0.0" />
   </ItemGroup>
 </Project>
