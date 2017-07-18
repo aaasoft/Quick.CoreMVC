@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Plugin.Test.Api
 {
@@ -10,13 +11,14 @@ namespace Plugin.Test.Api
     {
         public override string Name => "测试API";
         public override HttpMethod Method => HttpMethod.GET;
-        public override object Invoke(HttpContext context)
+
+        public override Task Invoke(HttpContext context, RequestDelegate next)
         {
-            return new
+            return Task.FromResult(new
             {
                 First = "Hello",
                 Last = "World!"
-            };
+            });
         }
     }
 }

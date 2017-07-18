@@ -12,7 +12,7 @@ namespace Quick.CoreMVC.Api
         /// <summary>
         /// HTTP方法
         /// </summary>
-        HttpMethod Method { get;}
+        HttpMethod Method { get; }
         /// <summary>
         /// 方法名称
         /// </summary>
@@ -43,6 +43,6 @@ namespace Quick.CoreMVC.Api
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        object Invoke(HttpContext context);
+        Task Invoke(HttpContext context, RequestDelegate next);
     }
 }

@@ -72,36 +72,49 @@ namespace Quick.CoreMVC.Middleware
                 return _next.Invoke(context);
 
 
-            Object data = null;
+
             //调用
             var invokeTime = DateTime.Now;
-            data = apiMethod.Invoke(context);
-            //如果返回值不是ApiResult
-            if (!(data is ApiResult))
-            {
-                var ret = ApiResult.Success(data);
-                ret.SetMetaInfo("usedTime", (DateTime.Now - invokeTime).ToString());
-                data = ret;
-            }
+            var task = apiMethod.Invoke(context, _next);
+            if (context.GetRequestHandled())
+                return task;
 
-            //要输出的内容
-            string result = null;
-            //JSON序列化的结果
-            var json = JsonConvert.SerializeObject(data/*, NodeManager.Instance.JsonSerializerSettings*/);
-            var jsonpCallback = req.Query[JSONP_CALLBACK];
+            return task.ContinueWith(t =>
+            {
+                if (t.IsCanceled)
+                    return Task.FromResult(0);
 
-            if (string.IsNullOrEmpty(jsonpCallback))
-            {
-                rep.ContentType = "text/json; charset=UTF-8";
-                result = json;
-            }
-            else
-            {
-                rep.ContentType = "application/x-javascript";
-                result = $"{jsonpCallback}({json})";
-            }
-            rep.Headers["Cache-Control"] = "no-cache";
-            return context.Output(encoding.GetBytes(result), true);
+                var taskType = task.GetType();
+                //读取任务结果
+                var pi = taskType.GetProperty(nameof(Task<object>.Result));
+                Object data = pi.GetValue(t);
+                //如果返回值不是ApiResult
+                if (!(data is ApiResult))
+                {
+                    var ret = ApiResult.Success(data);
+                    ret.SetMetaInfo("usedTime", (DateTime.Now - invokeTime).ToString());
+                    data = ret;
+                }
+
+                //要输出的内容
+                string result = null;
+                //JSON序列化的结果
+                var json = JsonConvert.SerializeObject(data/*, NodeManager.Instance.JsonSerializerSettings*/);
+                var jsonpCallback = req.Query[JSONP_CALLBACK];
+
+                if (string.IsNullOrEmpty(jsonpCallback))
+                {
+                    rep.ContentType = "text/json; charset=UTF-8";
+                    result = json;
+                }
+                else
+                {
+                    rep.ContentType = "application/x-javascript";
+                    result = $"{jsonpCallback}({json})";
+                }
+                rep.Headers["Cache-Control"] = "no-cache";
+                return context.Output(encoding.GetBytes(result), true);
+            });
         }
 
         public void Hunt(IDictionary<string, string> properties)

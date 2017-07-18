@@ -24,7 +24,7 @@ namespace Quick.CoreMVC.Api
     {
         private static readonly String FORMDATA_KEY = $"{typeof(HttpContextExtension).FullName}.{nameof(FORMDATA_KEY)}";
         public static readonly String ACCEPT_LANGUAGE_KEY = "Accept-Language";
-        
+
         /// <summary>
         /// 获取语言
         /// </summary>
@@ -388,29 +388,25 @@ namespace Quick.CoreMVC.Api
                 }
             });
         }
-
-        public static Task Output(this HttpContext context, Byte[] content, bool enableCompress = true)
+        
+        public static async Task Output(this HttpContext context, Byte[] content, bool enableCompress = true)
         {
+            var req = context.Request;
             var rep = context.Response;
 
             //如果启用压缩
-            if (enableCompress && IsAllowCompress(context.Request))
+            if (enableCompress && IsAllowCompress(req))
             {
                 rep.Headers["Content-Encoding"] = "gzip";
-                var gzStream = new GZipStream(rep.Body, CompressionMode.Compress);
-                return gzStream.WriteAsync(content, 0, content.Length)
-                    .ContinueWith(t =>
-                    {
-                        gzStream.Dispose();
-                    });
+                using (var gzStream = new GZipStream(rep.Body, CompressionMode.Compress))
+                    await gzStream.WriteAsync(content, 0, content.Length);
             }
             else
             {
                 rep.ContentLength = content.Length;
-                return rep.Body.WriteAsync(content, 0, content.Length);
+                await rep.Body.WriteAsync(content, 0, content.Length);
             }
         }
-
 
         public static void Add(this IDictionary<string, object> dict, Object obj)
         {
@@ -419,6 +415,31 @@ namespace Quick.CoreMVC.Api
             {
                 dict[propertyInfo.Name] = propertyInfo.GetValue(obj, null);
             }
+        }
+
+        private static readonly string REQUEST_HANDLED = $"{typeof(HttpContextExtension).FullName}.{nameof(REQUEST_HANDLED)}";
+
+        /// <summary>
+        /// 获取请求是否已经被处理
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static bool GetRequestHandled(this HttpContext context)
+        {
+            var obj = context.Items[REQUEST_HANDLED];
+            if (obj == null)
+                return false;
+            return (bool)obj;
+        }
+
+        /// <summary>
+        /// 设置请求是否已经被处理
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="handled"></param>
+        public static void SetRequestHandled(this HttpContext context, bool handled)
+        {
+            context.Items[REQUEST_HANDLED] = handled;
         }
     }
 }
