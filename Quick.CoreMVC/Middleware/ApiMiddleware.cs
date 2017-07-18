@@ -75,7 +75,7 @@ namespace Quick.CoreMVC.Middleware
 
             //调用
             var invokeTime = DateTime.Now;
-            var task = apiMethod.Invoke(context, _next);
+            var task = apiMethod.Invoke(context);
             if (context.GetRequestHandled())
                 return task;
 

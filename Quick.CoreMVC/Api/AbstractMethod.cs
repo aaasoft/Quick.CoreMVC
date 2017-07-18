@@ -35,7 +35,7 @@ namespace Quick.CoreMVC.Api
         /// </summary>
         public virtual void FinishFileUpload(HttpContext context) { }
 
-        public abstract Task Invoke(HttpContext context, RequestDelegate next);
+        public abstract Task Invoke(HttpContext context);
     }
 
     public abstract class AbstractMethod<TInput> : AbstractMethod
@@ -51,7 +51,7 @@ namespace Quick.CoreMVC.Api
         /// <returns></returns>
         public virtual TInput HandleParameter(HttpContext context, TInput input) => input;
 
-        public override Task Invoke(HttpContext context, RequestDelegate next)
+        public override Task Invoke(HttpContext context)
         {
             ApiParameterAttribute attribute = typeof(TInput).GetTypeInfo()
                 .GetCustomAttributes(typeof(ApiParameterAttribute), false)
@@ -106,9 +106,9 @@ namespace Quick.CoreMVC.Api
             //if (NodeManager.Instance.ParameterHandler != null)
             //    input = (TInput)NodeManager.Instance.ParameterHandler.Invoke(this, context, input);
             //调用
-            return Invoke(context, next, input);
+            return Invoke(context, input);
         }
 
-        public abstract Task Invoke(HttpContext context, RequestDelegate next, TInput input);
+        public abstract Task Invoke(HttpContext context, TInput input);
     }
 }

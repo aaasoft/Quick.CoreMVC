@@ -43,6 +43,6 @@ namespace Quick.CoreMVC.Api
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task Invoke(HttpContext context, RequestDelegate next);
+        Task Invoke(HttpContext context);
     }
 }
