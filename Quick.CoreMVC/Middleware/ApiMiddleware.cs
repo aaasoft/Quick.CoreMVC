@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quick.CoreMVC.Api;
 using Quick.Plugin;
 using Quick.Properties;
+using Quick.Properties.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Quick.CoreMVC.Middleware
 {
-    public class ApiMiddleware : IHungryPropertyHunter
+    public class ApiMiddleware
     {
         private RequestDelegate _next;
 
@@ -23,9 +26,12 @@ namespace Quick.CoreMVC.Middleware
         private Encoding encoding = new UTF8Encoding(false);
         private Dictionary<string, IMethod> apiMethodDict = new Dictionary<string, IMethod>();
 
-        public ApiMiddleware(RequestDelegate next = null)
+        public ApiMiddleware(RequestDelegate next, IDictionary<string, string> properties)
         {
             _next = next;
+
+            //IDictionary<string, string> properties = options?.Value?.Properties;
+
             //扫描加载的程序集
             foreach (var pluginInfo in PluginManager.Instance.GetAllPlugins())
             {
@@ -46,6 +52,8 @@ namespace Quick.CoreMVC.Middleware
                             methodPath = methodPath.Replace('.', '/');
                         }
                         var method = Activator.CreateInstance(type) as IMethod;
+                        if (properties != null)
+                            HunterUtils.TryHunt(method, properties);
                         apiMethodDict[methodPath] = method;
                     }
                 }
@@ -70,9 +78,7 @@ namespace Quick.CoreMVC.Middleware
                 //如果HTTP方法与Api方法注册的HTTP方法不匹配
                 || apiMethod.Method != (apiMethod.Method | currentHttpMethod))
                 return _next.Invoke(context);
-
-
-
+            
             //调用
             var invokeTime = DateTime.Now;
             var task = apiMethod.Invoke(context);
@@ -81,13 +87,19 @@ namespace Quick.CoreMVC.Middleware
 
             return task.ContinueWith(t =>
             {
+                Object data =null;
                 if (t.IsCanceled)
                     return Task.FromResult(0);
+                else if (t.IsFaulted)
+                    data = ApiResult.Error(500, t.Exception.ToString());
+                else
+                {
+                    var taskType = task.GetType();
+                    //读取任务结果
+                    var pi = taskType.GetProperty(nameof(Task<object>.Result));
+                    data = pi.GetValue(t);
+                }
 
-                var taskType = task.GetType();
-                //读取任务结果
-                var pi = taskType.GetProperty(nameof(Task<object>.Result));
-                Object data = pi.GetValue(t);
                 //如果返回值不是ApiResult
                 if (!(data is ApiResult))
                 {
@@ -115,11 +127,6 @@ namespace Quick.CoreMVC.Middleware
                 rep.Headers["Cache-Control"] = "no-cache";
                 return context.Output(encoding.GetBytes(result), true);
             });
-        }
-
-        public void Hunt(IDictionary<string, string> properties)
-        {
-            //NodeManager.Instance.Init(properties);
         }
     }
 }

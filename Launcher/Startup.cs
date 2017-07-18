@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Quick.CoreMVC.Middleware;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +46,13 @@ namespace Launcher
                 FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory())
             });
             //支持API中间件
-            app.UseMiddleware<Quick.CoreMVC.Middleware.ApiMiddleware>();
+            app.UseMiddleware<Quick.CoreMVC.Middleware.ApiMiddleware>(new object[]
+            {
+                new Dictionary<string,string>()
+                {
+                    ["Hello"] = "World!"
+                }
+            });
             app.Run(async (context) =>
             {
                 context.Response.StatusCode = 404;
