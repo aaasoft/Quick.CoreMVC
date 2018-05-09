@@ -31,9 +31,16 @@ namespace Quick.CoreMVC.Middleware
             _next = next;
 
             //IDictionary<string, string> properties = options?.Value?.Properties;
-
+            List<PluginInfo> list= new List<PluginInfo>();
+            var entryAssembly = Assembly.GetEntryAssembly();
+            list.Add(new PluginInfo()
+            {
+                Id=entryAssembly.GetName().Name,
+                Name=entryAssembly.GetName().Name
+            });
+            list.AddRange(PluginManager.Instance.GetAllPlugins());
             //扫描加载的程序集
-            foreach (var pluginInfo in PluginManager.Instance.GetAllPlugins())
+            foreach (var pluginInfo in list)
             {
                 var assembly = Assembly.Load(new AssemblyName(pluginInfo.Id));
                 foreach (var type in assembly.GetTypes())

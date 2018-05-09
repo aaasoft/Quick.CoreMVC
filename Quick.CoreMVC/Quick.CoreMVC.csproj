@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
     <Description>A sample web MVC framework.base on netstandard1.5。</Description>
-    <Version>1.0.0-preview6</Version>
+    <Version>1.0.0-preview7</Version>
     <PackageProjectUrl>https://github.com/aaasoft/Quick.CoreMVC</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/aaasoft/Quick.CoreMVC/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
